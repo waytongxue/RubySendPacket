@@ -4,21 +4,21 @@ require 'ruby-wmi'
 
 #=========================================for example=============================================
 #定义包结构
-# eth = CP::Ethernet.new('ff-ff-ff-ff-ff-ff','00-00-00-00-22-01')
-# ip = CP::IP.new('0.0.0.0','255.255.255.255')
-# udp = CP::UDP.new(68,67)
-# data = CP::Data.new('c:/wdw.dat')	 #数据包二进制字符串(raw data),使用wireshark选中数据部分,右键保存
+# eth = RSP::Ethernet.new('ff-ff-ff-ff-ff-ff','00-00-00-00-22-01')
+# ip = RSP::IP.new('0.0.0.0','255.255.255.255')
+# udp = RSP::UDP.new(68,67)
+# data = RSP::Data.new('c:/wdw.dat')	 #数据包二进制字符串(raw data),使用wireshark选中数据部分,右键保存
 
 
 #应用层没有定义格式, 只定义了一个简单的dhcp格式.  大家可以扩展七层协议.
-# dhcp = CP::DHCP.new(mac,'discover')
+# dhcp = RSP::DHRSP.new(mac,'discover')
 # dhcp.add_opt(53,[1])	#dhcp 消息类型
-# dhcp.add_opt(61,[1].pack('C')+CP::Utils.mac2byte(eth.src))  #客户端标识
+# dhcp.add_opt(61,[1].pack('C')+RSP::Utils.mac2byte(eth.src))  #客户端标识
 # dhcp.add_opt(12,'way')  #主机名
 # dhcp.add_opt(60,'MSFT 6.0')  #厂商标识
 
 #组装包并发送
-# pkt = CP::Packet.new('本地连接')
+# pkt = RSP::Packet.new('本地连接')
 # pkt.l2 = eth
 # pkt.vlan = xxxx
 # pkt.l3 = ip
@@ -32,11 +32,11 @@ require 'ruby-wmi'
 # 参考: {:l3_checksum => true,:l4_checksum => true,:l2_type=>true,:l3_protocol=>true,:l3_length=>true,:l4_length=>true}
 # pkt.raw  #不会计算任何检验和及长度, 完全是自己定义的原始数据包, 目的用来构造异常数据包
 
-# CP::Packet.send_packet(pkt.raw,'本地连接')		#另外一种发包方法
+# RSP::Packet.send_packet(pkt.raw,'本地连接')		#另外一种发包方法
 
 
 
-module CP #the short name of Create Base
+module RSP #the short name of Create Base
 	class Error < RuntimeError; end
   # 协议报文长度错误
   class PktSizeError < Error; end
@@ -83,7 +83,7 @@ module CP #the short name of Create Base
 		PROTO_IP  = 0x0800
 		PROTO_IPV6 = 0x86dd
 		PROTO_VLAN = 0X8100
-		PROTO_TCP = 6
+		PROTO_TRSP = 6
     PROTO_UDP = 17
 
 		def size
@@ -203,7 +203,7 @@ module CP #the short name of Create Base
 		end
 	end
 
-	class TCP < Base
+	class TRSP < Base
 		CHECKSUM_FMT = 'a4a4CCn' + 'nn'
 
 		attr_accessor :src,:dst,:sequence_number,:ack_number,:length,:flags,:windows_size,:checksum,:urgent_point
@@ -234,7 +234,7 @@ module CP #the short name of Create Base
 		end
 
 		def ptype
-			PROTO_TCP
+			PROTO_TRSP
 		end
 	end
 
@@ -261,8 +261,8 @@ module CP #the short name of Create Base
 
 	end
 
-	class DHCP < Base
-		#DHCP two part of : bootp + dhcp option  
+	class DHRSP < Base
+		#DHRSP two part of : bootp + dhcp option  
 
 		def initialize(cmac='00-00-00-00-00-01',type='discover')
 			@opt = []
