@@ -44,26 +44,26 @@ module RSP #the short name of Create Base
   class PktFileNoExistError < Error; end
 
 
-	class Utils
-		class << self
-			def checksum(bytes)
-				if bytes.size & 1 == 1
-				    bytes = bytes + "\0"
-				end 
-				sum = 0
-				bytes.unpack("n*").each {|n| sum += n }
-				sum = (sum & 0xffff) + (sum >> 16 & 0xffff)
-				~sum & 0xffff
-			end
+  class Utils
+  	class << self
+  		def checksum(bytes)
+  			if bytes.size & 1 == 1
+  				bytes = bytes + "\0"
+  			end 
+  			sum = 0
+  			bytes.unpack("n*").each {|n| sum += n }
+  			sum = (sum & 0xffff) + (sum >> 16 & 0xffff)
+  			~sum & 0xffff
+  		end
 
-			def mac2byte(mac)
-				case mac
-				when /:/
-					mac.split(':').inject(''){|m, b| m << b.to_i(16).chr}
-				when /-/
-					mac.split('-').inject(''){|m, b| m << b.to_i(16).chr}
-				end
-			end
+  		def mac2byte(mac)
+  			case mac
+  			when /:/
+  				mac.split(':').inject(''){|m, b| m << b.to_i(16).chr}
+  			when /-/
+  				mac.split('-').inject(''){|m, b| m << b.to_i(16).chr}
+  			end
+  		end
 
 			#devname to guid
 			def name2guid(name)
@@ -84,7 +84,7 @@ module RSP #the short name of Create Base
 		PROTO_IPV6 = 0x86dd
 		PROTO_VLAN = 0X8100
 		PROTO_TRSP = 6
-    PROTO_UDP = 17
+		PROTO_UDP = 17
 
 		def size
 			pkt.size
@@ -121,7 +121,7 @@ module RSP #the short name of Create Base
 
 	class IP < Base
 
-    FMT = 'CCnnnCCna4a4'
+		FMT = 'CCnnnCCna4a4'
 
 		attr_accessor :vh,:tos,:length,:id,:offset,:ttl,:protocol,:checksum,:src,:dst
 		def initialize(src='0.0.0.0',dst='0.0.0.0')
