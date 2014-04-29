@@ -1,7 +1,3 @@
-RubySendPacket
-
-ruby send ip  packet
-
 
 #定义包结构
 # eth = RSP::Ethernet.new('ff-ff-ff-ff-ff-ff','00-00-00-00-22-01')
